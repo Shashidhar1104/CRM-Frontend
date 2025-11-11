@@ -1,0 +1,27 @@
+.stat-card {
+  transition: all 0.25s ease-in-out;
+}
+
+.stat-card:hover {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.dashboard-page-bg {
+  background: linear-gradient(180deg, #f7f9fc 0%, #ffffff 100%);
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

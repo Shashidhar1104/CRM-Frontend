@@ -1,0 +1,49 @@
+/* Navbar.css */
+
+/* Smooth dropdown animation */
+.profile-dropdown-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+.profile-dropdown-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.profile-dropdown-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+.profile-dropdown-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Optional subtle shadow for navbar */
+.navbar-shadow {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Customize scrollbar inside dropdown (if content overflows) */
+.profile-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+.profile-dropdown::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+/* Optional: active icon pulse animation */
+@keyframes pulse-icon {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.pulse {
+  animation: pulse-icon 1.5s infinite;
+}

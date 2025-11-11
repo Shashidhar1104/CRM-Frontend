@@ -1,0 +1,59 @@
+.leads-table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.leads-table thead {
+  background-color: #f3f4f6;
+  text-align: left;
+}
+
+.leads-table th,
+.leads-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.leads-table tbody tr:hover {
+  background-color: #f9fafb;
+  transition: 0.2s;
+}
+
+/* Status Badges */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.qualified {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.unqualified {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.new {
+  background-color: #dbeafe;
+  color: #1e3a8a;
+}
+
+/* Action Buttons */
+.action-btn {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.2);
+}
