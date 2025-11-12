@@ -1,12 +1,15 @@
-// src/components/Navbar/Navbar.jsx
 import React, { useState, useEffect } from "react";
 import { BellIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "../../context/AuthContext"; // ✅ Import AuthContext
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ setSidebarOpen, onLogout }) => {
+const Navbar = ({ setSidebarOpen }) => {
   const [profileOpen, setProfileOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const { user, logout } = useAuth(); // ✅ Get user + logout from context
+  const navigate = useNavigate();
 
-  // ✅ Close dropdowns if clicked outside
+  // ✅ Close dropdowns when clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!e.target.closest(".navbar-dropdown")) {
@@ -18,9 +21,15 @@ const Navbar = ({ setSidebarOpen, onLogout }) => {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // ✅ Handle Logout
+  const handleLogout = () => {
+    logout();
+    navigate("/login"); // Redirect to login page
+  };
+
   return (
     <nav className="flex items-center justify-between bg-blue-700 text-white px-8 py-3 shadow-md relative z-20">
-      {/* ✅ Sidebar Toggle (Visible only on mobile) */}
+      {/* ☰ Sidebar Toggle (mobile only) */}
       <button
         className="md:hidden text-white focus:outline-none"
         onClick={() => setSidebarOpen((prev) => !prev)}
@@ -36,10 +45,10 @@ const Navbar = ({ setSidebarOpen, onLogout }) => {
         </svg>
       </button>
 
-      {/* ✅ Empty Spacer for balance on larger screens */}
+      {/* Empty space for symmetry */}
       <div className="hidden md:block flex-1"></div>
 
-      {/* ✅ Right Side Icons */}
+      {/* 🔔 Notifications + Profile */}
       <div className="flex items-center space-x-6 relative navbar-dropdown">
         {/* 🔔 Notifications */}
         <div className="relative">
@@ -81,12 +90,14 @@ const Navbar = ({ setSidebarOpen, onLogout }) => {
           </button>
 
           {profileOpen && (
-            <div className="absolute right-0 mt-3 w-44 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md shadow-lg z-20 border border-gray-200 dark:border-gray-700 animate-fadeIn">
+            <div className="absolute right-0 mt-3 w-48 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md shadow-lg z-20 border border-gray-200 dark:border-gray-700 animate-fadeIn">
               <div className="px-4 py-2 text-sm border-b border-gray-200 dark:border-gray-700">
-                <p className="font-semibold">My Account</p>
+                <p className="font-semibold">{user?.name || "My Account"}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
               </div>
+
               <button
-                onClick={onLogout}
+                onClick={handleLogout}
                 className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-gray-700 rounded-b-md transition"
               >
                 🚪 Logout

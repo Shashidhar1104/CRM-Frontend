@@ -1,19 +1,51 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ Import AuthContext
+import toast from "react-hot-toast"; // ✅ Toast library
 import "./AuthPage.css";
 import ampliNovaLogo from "../Assets/AmpliNova Final Logo.png";
 
-const AuthPage = ({ onLogin }) => {
+const AuthPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth(); // ✅ From AuthContext
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // ✅ Simulated login handler (ready for backend integration)
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Logging in:", formData);
-    if (onLogin) onLogin();
-    alert("Login successful!");
+    setLoading(true);
+
+    try {
+      // Simulated backend delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Dummy successful login
+      const token = "dummy-jwt-token";
+      const user = {
+        name: "Shashidhar",
+        email: formData.email,
+        role: "Admin",
+      };
+
+      // ✅ Save globally
+      login(user, token);
+
+      // ✅ Toast success message
+      toast.success("🎉 Login successful! Redirecting...");
+
+      // ✅ Redirect after short delay for smooth UX
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -67,9 +99,12 @@ const AuthPage = ({ onLogin }) => {
 
             <button
               type="submit"
-              className="w-full py-3 rounded-xl font-semibold tracking-wide text-white bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-indigo-900 transition duration-300 transform hover:-translate-y-[2px] shadow-lg"
+              disabled={loading}
+              className={`w-full py-3 rounded-xl font-semibold tracking-wide text-white bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-800 hover:to-indigo-900 transition duration-300 transform hover:-translate-y-[2px] shadow-lg ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             >
-              Sign In
+              {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
         </div>
