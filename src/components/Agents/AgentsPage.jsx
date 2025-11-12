@@ -1,4 +1,10 @@
 import React, { useEffect, useState } from "react";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import agentsData from "../../json/agents.json";
 import customersData from "../../json/customers.json";
 import Breadcrumb from "../common/Breadcrumb";
@@ -7,10 +13,11 @@ const AgentsPage = () => {
   const [agents, setAgents] = useState([]);
   const [filteredAgents, setFilteredAgents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
   const [selectedAgent, setSelectedAgent] = useState(null);
 
   const [newAgent, setNewAgent] = useState({
@@ -23,16 +30,16 @@ const AgentsPage = () => {
     dateJoined: new Date().toISOString().split("T")[0],
     leads: 0,
     conversionRate: "0%",
-    performanceRating: 0,
-    targetRevenue: 0,
     notes: "",
   });
 
+  // ✅ Load data
   useEffect(() => {
     setAgents(agentsData);
     setFilteredAgents(agentsData);
   }, []);
 
+  // ✅ Search filter
   useEffect(() => {
     const filtered = agents.filter(
       (a) =>
@@ -43,6 +50,7 @@ const AgentsPage = () => {
     setFilteredAgents(filtered);
   }, [searchTerm, agents]);
 
+  // ✅ Summary stats
   const totalAgents = agents.length;
   const activeAgents = agents.filter((a) => a.status === "Active").length;
   const avgConversion = agents.length
@@ -54,60 +62,69 @@ const AgentsPage = () => {
       ).toFixed(1)
     : 0;
 
+  // ✅ Add Agent
   const handleAddAgent = (e) => {
     e.preventDefault();
     const id = agents.length ? Math.max(...agents.map((a) => a.id)) + 1 : 1;
-    setAgents((prev) => [...prev, { ...newAgent, id }]);
+    const updated = [...agents, { ...newAgent, id }];
+    setAgents(updated);
     setShowAddModal(false);
+    setNewAgent({
+      name: "",
+      email: "",
+      phone: "",
+      role: "Sales Executive",
+      region: "",
+      status: "Active",
+      dateJoined: new Date().toISOString().split("T")[0],
+      leads: 0,
+      conversionRate: "0%",
+      notes: "",
+    });
   };
 
+  // ✅ Edit Agent
   const handleEditAgent = (e) => {
     e.preventDefault();
     if (!selectedAgent) return;
-    setAgents((prev) =>
-      prev.map((a) => (a.id === selectedAgent.id ? selectedAgent : a))
+    const updated = agents.map((a) =>
+      a.id === selectedAgent.id ? selectedAgent : a
     );
+    setAgents(updated);
     setShowEditModal(false);
-    setSelectedAgent(null);
   };
 
-  const handleDelete = (id) => setConfirmDelete(id);
-  const confirmDeleteAgent = () => {
-    setAgents((prev) => prev.filter((a) => a.id !== confirmDelete));
-    setConfirmDelete(null);
-  };
-
-  const openEditModal = (agent) => {
-    setSelectedAgent(agent);
-    setShowEditModal(true);
-  };
-
-  const openInfoModal = (agent) => {
-    setShowInfoModal(agent);
+  // ✅ Delete Agent
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this agent?")) {
+      setAgents((prev) => prev.filter((a) => a.id !== id));
+    }
   };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
       <Breadcrumb items={[{ label: "Dashboard" }, { label: "Agents" }]} />
 
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
             👨‍💼 Agents
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Manage sales agents and performance.
+            Manage your sales agents and performance.
           </p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
         >
-          + Add Agent
+          <PlusIcon className="h-5 w-5 mr-1" />
+          Add Agent
         </button>
       </div>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-600 dark:bg-blue-700 text-white rounded-xl p-4 shadow">
           <h4 className="text-sm opacity-80">Total Agents</h4>
@@ -168,24 +185,33 @@ const AgentsPage = () => {
                 </td>
                 <td className="px-4 py-2">{a.leads ?? 0}</td>
                 <td className="px-4 py-2">{a.conversionRate ?? "0%"}</td>
-                <td className="px-4 py-2 space-x-3">
+                <td className="px-4 py-2 flex space-x-3">
                   <button
-                    onClick={() => openInfoModal(a)}
+                    onClick={() => {
+                      setSelectedAgent(a);
+                      setShowInfoModal(true);
+                    }}
                     className="text-indigo-500 hover:text-indigo-400"
+                    title="View Info"
                   >
-                    ℹ️
+                    <EyeIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => openEditModal(a)}
+                    onClick={() => {
+                      setSelectedAgent(a);
+                      setShowEditModal(true);
+                    }}
                     className="text-blue-500 hover:text-blue-400"
+                    title="Edit"
                   >
-                    ✏️
+                    <PencilSquareIcon className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => handleDelete(a.id)}
                     className="text-red-500 hover:text-red-400"
+                    title="Delete"
                   >
-                    🗑️
+                    <TrashIcon className="h-5 w-5" />
                   </button>
                 </td>
               </tr>
@@ -213,16 +239,10 @@ const AgentsPage = () => {
           onClose={() => setShowEditModal(false)}
         />
       )}
-      {showInfoModal && (
+      {showInfoModal && selectedAgent && (
         <AgentInfoModal
-          agent={showInfoModal}
-          onClose={() => setShowInfoModal(null)}
-        />
-      )}
-      {confirmDelete && (
-        <ConfirmDeleteModal
-          onConfirm={confirmDeleteAgent}
-          onCancel={() => setConfirmDelete(null)}
+          agent={selectedAgent}
+          onClose={() => setShowInfoModal(false)}
         />
       )}
     </div>
@@ -230,84 +250,55 @@ const AgentsPage = () => {
 };
 
 /* ------------------- Agent Modal ------------------- */
-const AgentModal = ({ title, agent, setAgent, onSubmit, onClose }) => (
-  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-60 z-50 p-4">
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-lg relative">
-      <button
-        onClick={onClose}
-        className="absolute top-3 right-3 text-gray-500 dark:text-gray-400 hover:text-red-500"
-      >
-        ✖
-      </button>
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-5">
-        {title}
-      </h3>
-
-      <form onSubmit={onSubmit} className="space-y-3">
-        {["name", "email", "phone", "region"].map((field) => (
-          <input
-            key={field}
-            type={field === "email" ? "email" : "text"}
-            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-            value={agent[field]}
-            onChange={(e) => setAgent({ ...agent, [field]: e.target.value })}
-            className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 
-            bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100 focus:ring-2 focus:ring-blue-500"
-            required={field !== "region"}
-          />
-        ))}
-
-        <select
-          value={agent.role}
-          onChange={(e) => setAgent({ ...agent, role: e.target.value })}
-          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 
-          bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
-        >
-          <option>Sales Executive</option>
-          <option>Senior Sales Executive</option>
-          <option>Sales Manager</option>
-          <option>Team Lead</option>
-        </select>
-
-        <select
-          value={agent.status}
-          onChange={(e) => setAgent({ ...agent, status: e.target.value })}
-          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 
-          bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
-        >
-          <option>Active</option>
-          <option>Inactive</option>
-          <option>On Leave</option>
-        </select>
-
-        <input
-          type="number"
-          placeholder="Leads"
-          value={agent.leads}
-          onChange={(e) => setAgent({ ...agent, leads: Number(e.target.value) })}
-          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 
-          bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
-        />
-
-        <textarea
-          placeholder="Notes"
-          value={agent.notes}
-          onChange={(e) => setAgent({ ...agent, notes: e.target.value })}
-          rows="3"
-          className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 
-          bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-100"
-        />
-
+const AgentModal = ({ title, agent, setAgent, onSubmit, onClose }) => {
+  if (!agent) return null;
+  return (
+    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-full max-w-md relative">
         <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium shadow"
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
         >
-          Save
+          ✖
         </button>
-      </form>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+          {title}
+        </h3>
+
+        <form onSubmit={onSubmit} className="space-y-3">
+          {["name", "email", "phone", "region"].map((field) => (
+            <input
+              key={field}
+              type={field === "email" ? "email" : "text"}
+              placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+              value={agent[field] || ""}
+              onChange={(e) => setAgent({ ...agent, [field]: e.target.value })}
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              required={field !== "region"}
+            />
+          ))}
+
+          <select
+            value={agent.status}
+            onChange={(e) => setAgent({ ...agent, status: e.target.value })}
+            className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100"
+          >
+            <option>Active</option>
+            <option>Inactive</option>
+            <option>On Leave</option>
+          </select>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium"
+          >
+            Save
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /* ------------------- Agent Info Modal ------------------- */
 const AgentInfoModal = ({ agent, onClose }) => {
@@ -333,35 +324,21 @@ const AgentInfoModal = ({ agent, onClose }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800 dark:text-gray-200 mb-4">
           <div>
-            <p>
-              <strong>Name:</strong> {agent.name}
-            </p>
-            <p>
-              <strong>Email:</strong> {agent.email}
-            </p>
-            <p>
-              <strong>Phone:</strong> {agent.phone}
-            </p>
-            <p>
-              <strong>Region:</strong> {agent.region}
-            </p>
+            <p><strong>Name:</strong> {agent.name}</p>
+            <p><strong>Email:</strong> {agent.email}</p>
+            <p><strong>Phone:</strong> {agent.phone}</p>
           </div>
           <div>
-            <p>
-              <strong>Status:</strong> {agent.status}
-            </p>
-            <p>
-              <strong>Leads:</strong> {agent.leads}
-            </p>
-            <p>
-              <strong>Conversion:</strong> {agent.conversionRate}
-            </p>
+            <p><strong>Status:</strong> {agent.status}</p>
+            <p><strong>Leads:</strong> {agent.leads}</p>
+            <p><strong>Conversion:</strong> {agent.conversionRate}</p>
           </div>
         </div>
 
         <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
           Customers Managed ({assignedCustomers.length})
         </h4>
+
         {assignedCustomers.length > 0 ? (
           <table className="min-w-full border border-gray-200 dark:border-gray-700 rounded-lg">
             <thead className="bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200">
@@ -393,33 +370,5 @@ const AgentInfoModal = ({ agent, onClose }) => {
     </div>
   );
 };
-
-/* ------------------- Confirm Delete Modal ------------------- */
-const ConfirmDeleteModal = ({ onConfirm, onCancel }) => (
-  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-80 text-center">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        Confirm Deletion
-      </h3>
-      <p className="text-gray-600 dark:text-gray-400 mb-5">
-        Are you sure you want to delete this agent?
-      </p>
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={onConfirm}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-        >
-          Delete
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export default AgentsPage;

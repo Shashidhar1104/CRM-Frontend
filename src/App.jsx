@@ -1,9 +1,10 @@
 // src/App.jsx
 import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AuthPage from "./components/AuthPage";
 import DashboardLayout from "./components/Layout/DashboardLayout";
-import { ThemeProvider } from "./context/ThemeContext"; // ✅ Theme context
-import { DataProvider } from "./context/DataContext";   // ✅ Shared data context
+import { ThemeProvider } from "./context/ThemeContext";
+import { DataProvider } from "./context/DataContext";
 import "./App.css";
 
 function App() {
@@ -11,8 +12,6 @@ function App() {
 
   const handleLogin = () => setIsLoggedIn(true);
   const handleLogout = () => setIsLoggedIn(false);
-
-  // Read theme from localStorage for initial background
   const currentTheme = localStorage.getItem("theme");
 
   return (
@@ -25,11 +24,28 @@ function App() {
               : "bg-gray-50 text-gray-900"
           }`}
         >
-          {isLoggedIn ? (
-            <DashboardLayout onLogout={handleLogout} />
-          ) : (
-            <AuthPage onLogin={handleLogin} />
-          )}
+          <Router>
+            <Routes>
+              {/* 🔐 Public Login */}
+              {!isLoggedIn && (
+                <>
+                  <Route path="/login" element={<AuthPage onLogin={handleLogin} />} />
+                  {/* Redirect everything else to login */}
+                  <Route path="*" element={<Navigate to="/login" replace />} />
+                </>
+              )}
+
+              {/* 🧭 Protected Dashboard */}
+              {isLoggedIn && (
+                <>
+                  {/* Default route after login */}
+                  <Route path="/*" element={<DashboardLayout onLogout={handleLogout} />} />
+                  {/* Redirect base / to dashboard */}
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                </>
+              )}
+            </Routes>
+          </Router>
         </div>
       </DataProvider>
     </ThemeProvider>

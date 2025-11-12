@@ -1,3 +1,4 @@
+// src/components/Dashboard/DashboardPage.jsx
 import React from "react";
 import {
   LineChart,
@@ -43,7 +44,7 @@ const DashboardPage = () => {
 
   const COLORS = ["#2563eb", "#60a5fa", "#93c5fd"];
 
-  // Detect current theme
+  // Detect current theme (for dynamic chart styling)
   const isDark = document.documentElement.classList.contains("dark");
   const axisColor = isDark ? "#d1d5db" : "#6b7280";
   const gridColor = isDark ? "#374151" : "#e5e7eb";
@@ -59,7 +60,7 @@ const DashboardPage = () => {
   return (
     <div className="space-y-8 min-h-screen overflow-y-auto pb-10">
       {/* Header */}
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
         Dashboard Overview
       </h2>
 
@@ -93,10 +94,7 @@ const DashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
               <XAxis dataKey="month" stroke={axisColor} />
               <YAxis stroke={axisColor} />
-              <Tooltip
-                contentStyle={tooltipStyle}
-                itemStyle={{ color: textColor }}
-              />
+              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: textColor }} />
               <Line
                 type="monotone"
                 dataKey="sales"
@@ -121,29 +119,20 @@ const DashboardPage = () => {
                 cy="50%"
                 outerRadius={100}
                 dataKey="value"
-                label={({ name, percent }) =>
-                  `${name} ${(percent * 100).toFixed(0)}%`
-                }
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 labelLine={false}
               >
                 {customerData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
-                    stroke={isDark ? "#111827" : "#ffffff"}
+                    stroke="#fff"
                     strokeWidth={2}
                   />
                 ))}
               </Pie>
-              <Tooltip
-                contentStyle={tooltipStyle}
-                itemStyle={{ color: textColor }}
-              />
-              <Legend
-                verticalAlign="bottom"
-                iconType="circle"
-                wrapperStyle={{ color: textColor }}
-              />
+              <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: textColor }} />
+              <Legend verticalAlign="bottom" iconType="circle" wrapperStyle={{ color: textColor }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -155,17 +144,11 @@ const DashboardPage = () => {
           Agent Performance
         </h3>
         <ResponsiveContainer width="100%" height={350}>
-          <BarChart
-            data={agentData}
-            margin={{ top: 20, right: 30, left: 0, bottom: 5 }}
-          >
+          <BarChart data={agentData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
             <XAxis dataKey="agent" stroke={axisColor} />
             <YAxis stroke={axisColor} />
-            <Tooltip
-              contentStyle={tooltipStyle}
-              itemStyle={{ color: textColor }}
-            />
+            <Tooltip contentStyle={tooltipStyle} itemStyle={{ color: textColor }} />
             <Legend wrapperStyle={{ color: textColor }} />
             <Bar dataKey="leads" fill="#60a5fa" name="Leads Generated" />
             <Bar dataKey="conversions" fill="#2563eb" name="Conversions" />

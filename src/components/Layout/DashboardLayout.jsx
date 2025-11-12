@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 import DashboardPage from "../Dashboard/DashboardPage";
@@ -12,64 +14,45 @@ import ReportsPage from "../Reports/ReportsPage";
 import SettingsPage from "../Settings/SettingsPage";
 import ProfileSettings from "../Settings/ProfileSettings";
 import SystemPreferences from "../Settings/SystemPreferences";
+import SecuritySettings from "../Settings/SecuritySettings"; // ✅ NEW IMPORT
 
 const DashboardLayout = ({ onLogout }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [currentPage, setCurrentPage] = useState("dashboard");
-  const [settingsSubPage, setSettingsSubPage] = useState("overview");
-
-  const renderContent = () => {
-    switch (currentPage) {
-      case "all-leads":
-        return <AllLeadsPage />;
-      case "qualified-leads":
-        return <QualifiedLeadsPage />;
-      case "unqualified-leads":
-        return <UnqualifiedLeadsPage />;
-      case "customers":
-        return <CustomersPage />;
-      case "agents":
-        return <AgentsPage />;
-      case "sales":
-        return <SalesPage />;
-      case "reports":
-        return <ReportsPage />;
-      case "settings":
-        switch (settingsSubPage) {
-          case "profile":
-            return (
-              <ProfileSettings
-                onBack={() => setSettingsSubPage("overview")}
-              />
-            );
-          case "preferences":
-            return (
-              <SystemPreferences
-                onBack={() => setSettingsSubPage("overview")}
-              />
-            );
-          default:
-            return (
-              <SettingsPage
-                setSettingsSubPage={setSettingsSubPage}
-              />
-            );
-        }
-      default:
-        return <DashboardPage />;
-    }
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden">
       {/* Sidebar */}
-      <Sidebar sidebarOpen={sidebarOpen} setCurrentPage={setCurrentPage} />
+      <Sidebar sidebarOpen={sidebarOpen} setCurrentPage={(page) => navigate(page)} />
 
-      {/* Main Content */}
+      {/* Main Section */}
       <div className="flex flex-col flex-1 overflow-hidden">
         <Navbar setSidebarOpen={setSidebarOpen} onLogout={onLogout} />
+
         <main className="flex-1 overflow-y-auto p-6 transition-colors bg-gray-50 dark:bg-gray-900">
-          {renderContent()}
+          <Routes>
+            {/* ✅ Default route → Dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+            {/* ✅ Main Pages */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/leads/all" element={<AllLeadsPage />} />
+            <Route path="/leads/qualified" element={<QualifiedLeadsPage />} />
+            <Route path="/leads/unqualified" element={<UnqualifiedLeadsPage />} />
+            <Route path="/customers" element={<CustomersPage />} />
+            <Route path="/agents" element={<AgentsPage />} />
+            <Route path="/sales" element={<SalesPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+
+            {/* ✅ Settings & Nested Pages */}
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/settings/profile" element={<ProfileSettings />} />
+            <Route path="/settings/preferences" element={<SystemPreferences />} />
+            <Route path="/settings/security" element={<SecuritySettings />} /> {/* ✅ NEW ROUTE */}
+
+            {/* ✅ Fallback - redirect unknown routes */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
         </main>
       </div>
     </div>

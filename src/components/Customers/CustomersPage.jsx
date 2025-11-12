@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from "react";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import customersData from "../../json/customers.json";
-import agentsData from "../../json/agents.json"; // ✅ New: Load agent data
+import agentsData from "../../json/agents.json";
 import Breadcrumb from "../common/Breadcrumb";
 
 const CustomersPage = () => {
   const [customers, setCustomers] = useState([]);
   const [filteredCustomers, setFilteredCustomers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showInfoModal, setShowInfoModal] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [newCustomer, setNewCustomer] = useState({
@@ -33,7 +40,7 @@ const CustomersPage = () => {
     setFilteredCustomers(customersData);
   }, []);
 
-  // ✅ Filter search results
+  // ✅ Search Filter
   useEffect(() => {
     const filtered = customers.filter(
       (c) =>
@@ -44,7 +51,7 @@ const CustomersPage = () => {
     setFilteredCustomers(filtered);
   }, [searchTerm, customers]);
 
-  // ✅ Summary stats
+  // ✅ Summary Stats
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter((c) => c.status === "Active").length;
   const avgOrders =
@@ -55,14 +62,28 @@ const CustomersPage = () => {
         ).toFixed(1)
       : 0;
 
-  // ✅ Handlers
+  // ✅ Add Customer
   const handleAddCustomer = (e) => {
     e.preventDefault();
     const updated = [...customers, { ...newCustomer, id: customers.length + 1 }];
     setCustomers(updated);
     setShowAddModal(false);
+    setNewCustomer({
+      name: "",
+      email: "",
+      phone: "",
+      assignedAgent: "",
+      qualificationStatus: "Qualified",
+      customerType: "Regular",
+      status: "Active",
+      joinDate: new Date().toISOString().split("T")[0],
+      totalSpent: 0,
+      orders: 0,
+      notes: "",
+    });
   };
 
+  // ✅ Edit Customer
   const handleEditCustomer = (e) => {
     e.preventDefault();
     const updated = customers.map((c) =>
@@ -72,25 +93,15 @@ const CustomersPage = () => {
     setShowEditModal(false);
   };
 
-  const handleDelete = (id) => setConfirmDelete(id);
-  const confirmDeleteCustomer = () => {
-    const updated = customers.filter((c) => c.id !== confirmDelete);
-    setCustomers(updated);
-    setConfirmDelete(null);
-  };
-
-  const openEditModal = (customer) => {
-    setSelectedCustomer(customer);
-    setShowEditModal(true);
-  };
-
-  const openInfoModal = (customer) => {
-    setShowInfoModal(customer);
+  // ✅ Delete
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      setCustomers(customers.filter((c) => c.id !== id));
+    }
   };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6">
-      {/* ✅ Breadcrumb */}
       <Breadcrumb items={[{ label: "Dashboard" }, { label: "Customers" }]} />
 
       {/* Header */}
@@ -105,13 +116,14 @@ const CustomersPage = () => {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
+          className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
         >
-          + Add Customer
+          <PlusIcon className="h-5 w-5 mr-1" />
+          Add Customer
         </button>
       </div>
 
-      {/* 🧩 Summary Cards */}
+      {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-600 dark:bg-blue-700 text-white rounded-xl p-4 shadow">
           <h4 className="text-sm opacity-80">Total Customers</h4>
@@ -153,7 +165,6 @@ const CustomersPage = () => {
               <th className="px-4 py-2 text-left">Actions</th>
             </tr>
           </thead>
-
           <tbody className="text-gray-800 dark:text-gray-200">
             {filteredCustomers.map((c) => (
               <tr
@@ -173,24 +184,33 @@ const CustomersPage = () => {
                 </td>
                 <td className="px-4 py-2">${c.totalSpent}</td>
                 <td className="px-4 py-2">{c.orders}</td>
-                <td className="px-4 py-2 space-x-3">
+                <td className="px-4 py-2 flex space-x-3">
                   <button
-                    onClick={() => openInfoModal(c)}
+                    onClick={() => {
+                      setSelectedCustomer(c);
+                      setShowInfoModal(true);
+                    }}
                     className="text-indigo-500 hover:text-indigo-400"
+                    title="View Info"
                   >
-                    ℹ️
+                    <EyeIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => openEditModal(c)}
+                    onClick={() => {
+                      setSelectedCustomer(c);
+                      setShowEditModal(true);
+                    }}
                     className="text-blue-500 hover:text-blue-400"
+                    title="Edit"
                   >
-                    ✏️
+                    <PencilSquareIcon className="h-5 w-5" />
                   </button>
                   <button
                     onClick={() => handleDelete(c.id)}
                     className="text-red-500 hover:text-red-400"
+                    title="Delete"
                   >
-                    🗑️
+                    <TrashIcon className="h-5 w-5" />
                   </button>
                 </td>
               </tr>
@@ -199,37 +219,31 @@ const CustomersPage = () => {
         </table>
       </div>
 
-      {/* ➕ Add/Edit/Info/Delete Modals */}
+      {/* Modals */}
       {showAddModal && (
         <CustomerModal
           title="Add Customer"
-          agents={agentsData}
           customer={newCustomer}
           setCustomer={setNewCustomer}
           onSubmit={handleAddCustomer}
           onClose={() => setShowAddModal(false)}
+          agents={agentsData}
         />
       )}
       {showEditModal && selectedCustomer && (
         <CustomerModal
           title="Edit Customer"
-          agents={agentsData}
           customer={selectedCustomer}
           setCustomer={setSelectedCustomer}
           onSubmit={handleEditCustomer}
           onClose={() => setShowEditModal(false)}
+          agents={agentsData}
         />
       )}
-      {showInfoModal && (
+      {showInfoModal && selectedCustomer && (
         <CustomerInfoModal
-          customer={showInfoModal}
-          onClose={() => setShowInfoModal(null)}
-        />
-      )}
-      {confirmDelete && (
-        <ConfirmDeleteModal
-          onConfirm={confirmDeleteCustomer}
-          onCancel={() => setConfirmDelete(null)}
+          customer={selectedCustomer}
+          onClose={() => setShowInfoModal(false)}
         />
       )}
     </div>
@@ -251,11 +265,10 @@ const CustomerModal = ({ title, customer, setCustomer, onSubmit, onClose, agents
       </h3>
 
       <form onSubmit={onSubmit} className="space-y-3">
-        {/* Text Inputs */}
         {["name", "email", "phone"].map((field) => (
           <input
             key={field}
-            type={field === "email" ? "email" : field === "phone" ? "tel" : "text"}
+            type={field === "email" ? "email" : "text"}
             placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
             value={customer[field]}
             onChange={(e) => setCustomer({ ...customer, [field]: e.target.value })}
@@ -264,7 +277,6 @@ const CustomerModal = ({ title, customer, setCustomer, onSubmit, onClose, agents
           />
         ))}
 
-        {/* Dropdowns */}
         <select
           value={customer.assignedAgent}
           onChange={(e) => setCustomer({ ...customer, assignedAgent: e.target.value })}
@@ -278,27 +290,6 @@ const CustomerModal = ({ title, customer, setCustomer, onSubmit, onClose, agents
           ))}
         </select>
 
-        <select
-          value={customer.qualificationStatus}
-          onChange={(e) => setCustomer({ ...customer, qualificationStatus: e.target.value })}
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100"
-        >
-          <option>Qualified</option>
-          <option>Unqualified</option>
-          <option>Prospect</option>
-        </select>
-
-        <select
-          value={customer.customerType}
-          onChange={(e) => setCustomer({ ...customer, customerType: e.target.value })}
-          className="w-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 text-gray-800 dark:text-gray-100"
-        >
-          <option>Regular</option>
-          <option>Premium</option>
-          <option>Trial</option>
-        </select>
-
-        {/* Notes */}
         <textarea
           placeholder="Notes"
           value={customer.notes}
@@ -353,7 +344,6 @@ const CustomerInfoModal = ({ customer, onClose }) => {
               <p><strong>Name:</strong> {agent.name}</p>
               <p><strong>Email:</strong> {agent.email}</p>
               <p><strong>Phone:</strong> {agent.phone}</p>
-              <p><strong>Region:</strong> {agent.region || "—"}</p>
             </>
           )}
         </div>
@@ -361,33 +351,5 @@ const CustomerInfoModal = ({ customer, onClose }) => {
     </div>
   );
 };
-
-/* ------------------- Confirm Delete Modal ------------------- */
-const ConfirmDeleteModal = ({ onConfirm, onCancel }) => (
-  <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
-    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 w-80 text-center">
-      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">
-        Confirm Deletion
-      </h3>
-      <p className="text-gray-600 dark:text-gray-400 mb-5">
-        Are you sure you want to delete this customer?
-      </p>
-      <div className="flex justify-center gap-4">
-        <button
-          onClick={onConfirm}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-        >
-          Delete
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export default CustomersPage;

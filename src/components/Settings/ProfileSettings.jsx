@@ -1,7 +1,11 @@
+// src/components/Settings/ProfileSettings.jsx
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Breadcrumb from "../common/Breadcrumb";
 
-const ProfileSettings = ({ onBack }) => {
+const ProfileSettings = () => {
+  const navigate = useNavigate();
+
   const [profile, setProfile] = useState({
     name: "Shashidhar",
     email: "shashidhar@example.com",
@@ -23,7 +27,7 @@ const ProfileSettings = ({ onBack }) => {
       {/* ✅ Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: "Settings", onClick: onBack },
+          { label: "Settings", onClick: () => navigate("/settings") },
           { label: "Profile Settings" },
         ]}
       />
@@ -73,7 +77,15 @@ const ProfileSettings = ({ onBack }) => {
           />
         </div>
 
-        <div className="text-right">
+        <div className="flex justify-between items-center">
+          <button
+            type="button"
+            onClick={() => navigate("/settings")}
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-medium shadow"
+          >
+            ← Back
+          </button>
+
           <button
             type="submit"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow"

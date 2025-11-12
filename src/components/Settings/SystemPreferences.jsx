@@ -1,53 +1,48 @@
-import React, { useContext } from "react";
-import { ThemeContext } from "../../context/ThemeContext";
+// src/components/Settings/SystemPreferences.jsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContext";
 import Breadcrumb from "../common/Breadcrumb";
 
-const SystemPreferences = ({ onBack }) => {
-  const { isDarkMode, setIsDarkMode } = useContext(ThemeContext);
+const SystemPreferences = () => {
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 max-w-2xl mx-auto">
-      {/* ✅ Breadcrumb */}
+      {/* ✅ Breadcrumb navigation */}
       <Breadcrumb
         items={[
-          { label: "Settings", onClick: onBack },
+          { label: "Settings", onClick: () => navigate("/settings") },
           { label: "System Preferences" },
         ]}
       />
 
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">
         ⚙️ System Preferences
       </h2>
+      <p className="text-gray-600 dark:text-gray-400 mb-6">
+        Manage your theme and UI appearance preferences.
+      </p>
 
-      <div className="space-y-6">
-        {/* Dark Mode Toggle */}
-        <div className="flex items-center justify-between">
-          <span className="text-gray-800 dark:text-gray-200 font-medium">
-            Dark Mode
-          </span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isDarkMode}
-              onChange={() => setIsDarkMode(!isDarkMode)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600"></div>
-            <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-5 transition-transform"></div>
-          </label>
-        </div>
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => navigate("/settings")}
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg font-medium shadow"
+        >
+          ← Back
+        </button>
 
-        {/* Notifications */}
-        <div className="flex items-center justify-between border-t pt-4">
-          <span className="text-gray-800 dark:text-gray-200 font-medium">
-            Notifications
-          </span>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" defaultChecked />
-            <div className="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600"></div>
-            <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-5 transition-transform"></div>
-          </label>
-        </div>
+        <button
+          onClick={toggleTheme}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium shadow"
+        >
+          Toggle Theme ({theme === "dark" ? "🌙 Dark" : "☀️ Light"})
+        </button>
       </div>
     </div>
   );
