@@ -15,13 +15,13 @@ const AgentsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Load agents from JSON
+  // ✅ Load agents data
   useEffect(() => {
     setAgents(agentsData);
     setFilteredAgents(agentsData);
   }, []);
 
-  // ✅ Search filter
+  // ✅ Filter agents based on search input
   useEffect(() => {
     const filtered = agents.filter(
       (a) =>
@@ -32,7 +32,7 @@ const AgentsPage = () => {
     setFilteredAgents(filtered);
   }, [searchTerm, agents]);
 
-  // ✅ Delete Agent (temporary local)
+  // ✅ Delete Agent
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this agent?")) {
       setAgents((prev) => prev.filter((a) => a.id !== id));
@@ -66,7 +66,7 @@ const AgentsPage = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate("/agents/add")}
+          onClick={() => navigate("/agents/form")}
           className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
         >
           <PlusIcon className="h-5 w-5 mr-1" />
@@ -90,7 +90,7 @@ const AgentsPage = () => {
         </div>
       </div>
 
-      {/* Search */}
+      {/* Search Bar */}
       <div className="mb-4">
         <input
           type="text"
@@ -144,7 +144,7 @@ const AgentsPage = () => {
                     <EyeIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => navigate(`/agents/${a.id}/edit`)}
+                    onClick={() => navigate(`/agents/form/${a.id}`)}
                     className="text-blue-500 hover:text-blue-400"
                     title="Edit"
                   >

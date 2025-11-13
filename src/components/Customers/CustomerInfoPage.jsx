@@ -1,6 +1,5 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast"; // ✅ Toast import
 import Breadcrumb from "../common/Breadcrumb";
 import customersData from "../../json/customers.json";
 import agentsData from "../../json/agents.json";
@@ -14,18 +13,6 @@ const CustomerInfoPage = () => {
     (a) => a.name === customer?.assignedAgent
   );
 
-  // ✅ Handle Delete with toast
-  const handleDelete = () => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
-    if (confirmDelete) {
-      toast.success("Customer deleted successfully!");
-      console.log(`🗑 Deleted Customer ID: ${id}`);
-
-      // Simulate redirect after toast
-      setTimeout(() => navigate("/customers"), 800);
-    }
-  };
-
   if (!customer)
     return (
       <div className="p-8 text-center text-gray-600 dark:text-gray-300">
@@ -35,7 +22,6 @@ const CustomerInfoPage = () => {
 
   return (
     <div className="bg-white dark:bg-gray-900 rounded-xl shadow p-6 max-w-3xl mx-auto">
-      {/* Breadcrumb */}
       <Breadcrumb
         items={[
           { label: "Customers", path: "/customers" },
@@ -48,16 +34,19 @@ const CustomerInfoPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
           👁 Customer Details
         </h2>
+
+        {/* 🔙 Only Back button */}
         <button
           onClick={() => navigate("/customers")}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 
-          text-gray-800 dark:text-gray-100 rounded-lg font-medium transition"
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 
+                     dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 
+                     rounded-lg font-medium transition"
         >
           ← Back to Customers
         </button>
       </div>
 
-      {/* Customer Details */}
+      {/* Customer Info */}
       <div className="space-y-3 text-gray-800 dark:text-gray-200">
         <p><strong>Name:</strong> {customer.name}</p>
         <p><strong>Email:</strong> {customer.email}</p>
@@ -70,7 +59,6 @@ const CustomerInfoPage = () => {
         <p><strong>Notes:</strong> {customer.notes || "—"}</p>
       </div>
 
-      {/* Assigned Agent Section */}
       {agent && (
         <>
           <hr className="my-4 border-gray-300 dark:border-gray-700" />
@@ -84,31 +72,6 @@ const CustomerInfoPage = () => {
           </div>
         </>
       )}
-
-      {/* Actions */}
-      <div className="flex justify-end space-x-3 pt-6">
-        <button
-          onClick={() => navigate(`/customers/${id}/edit`)}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
-        >
-          Edit
-        </button>
-
-        <button
-          onClick={handleDelete}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition"
-        >
-          Delete
-        </button>
-
-        <button
-          onClick={() => navigate("/customers")}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 
-          text-gray-800 dark:text-gray-100 rounded-lg font-medium transition"
-        >
-          ← Back to Customers
-        </button>
-      </div>
     </div>
   );
 };

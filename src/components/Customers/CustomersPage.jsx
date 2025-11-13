@@ -1,3 +1,4 @@
+// src/components/Customers/CustomersPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   EyeIcon,
@@ -15,7 +16,7 @@ const CustomersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  // ✅ Load initial data
+  // ✅ Load data
   useEffect(() => {
     setCustomers(customersData);
     setFilteredCustomers(customersData);
@@ -39,7 +40,7 @@ const CustomersPage = () => {
     }
   };
 
-  // ✅ Summary Stats
+  // ✅ Summary
   const totalCustomers = customers.length;
   const activeCustomers = customers.filter((c) => c.status === "Active").length;
   const avgOrders =
@@ -65,7 +66,7 @@ const CustomersPage = () => {
           </p>
         </div>
         <button
-          onClick={() => navigate("/customers/add")}
+          onClick={() => navigate("/customers/form")}
           className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium shadow"
         >
           <PlusIcon className="h-5 w-5 mr-1" />
@@ -73,7 +74,7 @@ const CustomersPage = () => {
         </button>
       </div>
 
-      {/* Summary */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-600 dark:bg-blue-700 text-white rounded-xl p-4 shadow">
           <h4 className="text-sm opacity-80">Total Customers</h4>
@@ -143,7 +144,7 @@ const CustomersPage = () => {
                     <EyeIcon className="h-5 w-5" />
                   </button>
                   <button
-                    onClick={() => navigate(`/customers/${c.id}/edit`)}
+                    onClick={() => navigate(`/customers/form/${c.id}`)}
                     className="text-blue-500 hover:text-blue-400"
                     title="Edit"
                   >
